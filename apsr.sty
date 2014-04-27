@@ -1,0 +1,89 @@
+% apsr.sty
+% by Jonathan N. Katz <jkatz@latte.harvard.edu>
+% Modified by Gary King <king@harvard.edu>
+%
+% Purpose: To set articles using APSR guidelines.
+%
+
+% add the following line (without %) after \maketitle
+%     \baselineskip=1.57\baselineskip
+
+% add this (without %) at the end of the document:
+% \clearpage
+% \begingroup
+% \setlength{\parindent}{0pt}\setlength{\parskip}{2ex}
+% \renewcommand{\enotesize}{\fontsize{11pt}{20 pt plus 1 pt minus 0.5 pt}\selectfont}
+% \theendnotes
+% %\bigskip
+% \endgroup
+
+% \clearpage
+%            % change the attached to match your bibtex file locations
+% \bibliographystyle{/home/king/c/gkbibtex/pa}
+% \bibliography{/home/king/c/gkbibtex/gk}
+
+
+% No numbered sections
+\setcounter{secnumdepth}{-2}
+
+% Redefine section commands to get appropriate apparence
+
+\renewcommand{\section}{\@startsection%
+  {section}%                                    % the name
+  {1}%                                          % the level
+  {0mm}%                                        % the intent
+  {0.6\baselineskip}%                             % the beforeskip
+  {0.25\baselineskip}%                              % the afterskip
+  {\normalfont\large\bfseries\centering}%        % the style             
+}
+
+\renewcommand{\subsection}{\@startsection%
+  {subsection}%                                 % the name
+  {2}%                                          % the level
+  {0mm}%                                        % the intent
+  {0.6\baselineskip}%                             % the beforeskip
+  {0.25\baselineskip}%                              % the afterskip
+  {\normalfont\large\bfseries}%  % the style             
+}
+
+\renewcommand{\subsubsection}{\@startsection%
+  {subsubsection}%                              % the name
+  {3}%                                          % the level
+  {0mm}%                                        % the intent
+  {0mm}%                          % the beforeskip
+  {0mm}%                          % the afterskip
+  {\normalfont\normalsize\underline}%    % the style             
+}
+
+\RequirePackage{times}
+\RequirePackage{endnotes}
+\let\footnote=\endnote
+\RequirePackage[nolists,nomarkers]{endfloat}
+\RequirePackage{vmargin}
+\setpapersize{USletter}
+\RequirePackage{ragged2e}
+\RaggedRight
+\setlength{\parindent}{7mm}
+
+% set page numbers to arabic                                           
+\pagenumbering{arabic}
+
+% set margin to 1 inch all around                                      
+\setmarginsrb{1in}{1in}{1in}{1in}{0pt}{0mm}{0pt}{0mm}
+\paperwidth=8.5in
+\paperheight=11in
+
+% lower page number a bit
+\footskip=.5in
+
+% make paragraph header format as underlined                                             
+\renewcommand{\paragraph}{\@startsection
+  {paragraph}%                                                         
+  {4}%                                                                 
+  {0mm}%                                                               
+  {\baselineskip}%                                                     
+  {-\fontdimen2\font
+    plus -\fontdimen3\font
+    minus -\fontdimen4\font}%                                          
+  {\normalfont\normalsize\underline}
+}
