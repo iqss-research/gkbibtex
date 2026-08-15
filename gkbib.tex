@@ -1,0 +1,37 @@
+% Shared bibliography from https://github.com/iqss-research/gkbibtex
+%
+% After \usepackage{biblatex}:
+%   \input{gkbib}
+%
+% Same preamble for you, coauthors, and Overleaf. First existing path wins:
+%   1. ../../gkbibtex/   (this file lives in .../github/my-paper/text/)
+%   2. ../gkbibtex/      (compile from the paper repo root)
+%   3. gkbibtex/         (optional git submodule in this folder)
+%   4. ./                (copies in this folder — Overleaf / paper-only clone)
+%
+% Do not use [location=remote] or raw.githubusercontent.com: slow, CDN-cached
+% for minutes, and Overleaf cannot fetch it.
+%
+% Overleaf: keep gk.bib, gkpubs.bib, and this file in the project. From a
+% machine that has the gkbibtex clone, refresh copies with:
+%   /path/to/gkbibtex/sync-gkbib
+% (run in the folder that contains the .tex file).
+
+\makeatletter
+\newcommand{\gkaddbib}[1]{%
+  \def\gk@found{0}%
+  \@for\gk@dir:={../../gkbibtex/,../gkbibtex/,gkbibtex/,}\do{%
+    \if0\gk@found
+      \IfFileExists{\gk@dir#1}{%
+        \addbibresource{\gk@dir#1}%
+        \def\gk@found{1}%
+      }{}%
+    \fi
+  }%
+  \if0\gk@found
+    \errmessage{gkbib: cannot find #1. Clone iqss-research/gkbibtex next to this paper repo, or copy #1 into this folder (required on Overleaf)}%
+  \fi
+}
+\makeatother
+\gkaddbib{gk.bib}
+\gkaddbib{gkpubs.bib}
