@@ -16,6 +16,10 @@
 % machine that has the gkbibtex clone, refresh copies with:
 %   /path/to/gkbibtex/sync-gkbib
 % (run in the folder that contains the .tex file).
+%
+% Coauthors add paper-only cites to refs.bib (never gk.bib / gkpubs.bib).
+% You can later fold new keys into gk.bib with:
+%   /path/to/gkbibtex/absorb-refs refs.bib
 
 \makeatletter
 \newcommand{\gkaddbib}[1]{%
@@ -35,3 +39,7 @@
 \makeatother
 \gkaddbib{gk.bib}
 \gkaddbib{gkpubs.bib}
+% Paper-local extras (optional). Coauthors edit this; it is never overwritten
+% by sync-gkbib. Look only in this folder / parent, not in gkbibtex.
+\IfFileExists{refs.bib}{\addbibresource{refs.bib}}{}
+\IfFileExists{../refs.bib}{\addbibresource{../refs.bib}}{}

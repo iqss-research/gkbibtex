@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Append refs.bib entries whose keys are not already in gk.bib.
+
+Never writes gkpubs.bib. Not a git merge: unique entries are concatenated
+at the end of gk.bib.
+
+Usage:
+  absorb-refs [refs.bib]
+  dest of gk.bib is this repo (the directory that contains this script).
+"""
+from __future__ import annotations
+
+import pathlib
+import re
+import sys
+
+SKIP_TYPES = {"string", "preamble", "comment"}
+ENTRY_START = re.compile(r"@(\w+)\s*[\{\(]\s*([^,\s\{\}]+)", re.I)
+
+
+def split_entries(text: str) -> list[tuple[str, str]]:
+    """Return (key, full_entry_text) for each real bib entry, in order."""
+    out: list[tuple[str, str]] = []
+    i, n = 0, len(text)
+    while i < n:
+        at = text.find("@", i)
+        if at < 0:
+            break
+        m = ENTRY_START.match(text, at)
+        if not m:
+            i = at + 1
+            continue
+        typ = m.group(1).lower()
+        key = m.group(2)
+        opener_at = at + m.group(0).find("{")
+        if opener_at < at:
+            opener_at = at + m.group(0).find("(")
+        opener = text[opener_at]
+        closer = "}" if opener == "{" else ")"
+        depth = 0
+        k = opener_at
+        while k < n:
+            c = text[k]
+            if c == opener:
+                depth += 1
+            elif c == closer:
+                depth -= 1
+                if depth == 0:
+                    k += 1
+                    break
+            k += 1
+        block = text[at:k].rstrip() + "\n"
+        if typ not in SKIP_TYPES:
+            out.append((key, block))
+        i = k
+    return out
+
+
+def main() -> int:
+    src = pathlib.Path(__file__).resolve().parent
+    gk_path = src / "gk.bib"
+    refs_path = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "refs.bib")
+    if not gk_path.is_file():
+        print(f"absorb-refs: missing {gk_path}", file=sys.stderr)
+        return 2
+    if not refs_path.is_file():
+        print(f"absorb-refs: no {refs_path} (nothing to do)")
+        return 0
+
+    gk_text = gk_path.read_text(encoding="utf-8", errors="replace")
+    refs_text = refs_path.read_text(encoding="utf-8", errors="replace")
+    gk_keys = {k.lower(): k for k, _ in split_entries(gk_text)}
+    added = []
+    chunks = []
+    for key, block in split_entries(refs_text):
+        if key.lower() in gk_keys:
+            continue
+        added.append(key)
+        gk_keys[key.lower()] = key
+        chunks.append(block if block.endswith("\n") else block + "\n")
+
+    if not added:
+        print(f"absorb-refs: nothing new in {refs_path} ({len(gk_keys)} keys already in gk.bib)")
+        return 0
+
+    extra = "\n% --- absorbed from " + str(refs_path) + " ---\n\n" + "\n".join(chunks)
+    if not gk_text.endswith("\n"):
+        extra = "\n" + extra
+    gk_path.write_text(gk_text + extra, encoding="utf-8")
+    print(f"absorb-refs: appended {len(added)} entr{'y' if len(added) == 1 else 'ies'} to {gk_path}")
+    for k in added:
+        print(f"  + {k}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -6,4 +6,4 @@ set -e
 SRC=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 DEST=${1:-.}
 cp -f "$SRC/gk.bib" "$SRC/gkpubs.bib" "$SRC/gkbib.tex" "$DEST/"
-echo "copied gk.bib gkpubs.bib gkbib.tex -> $DEST"
+echo "copied gk.bib gkpubs.bib gkbib.tex -> $DEST (refs.bib untouched)"
